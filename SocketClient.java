@@ -4,28 +4,35 @@ import java.net.*;
 public class SocketClient {
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 1) {
-            System.out.println("Usage: java SocketClient <string>");
-            return;
+        String input;
+        if (args.length >= 1) {
+            input = args[0];
+        } else {
+            System.out.print("Enter message to send: ");
+            BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+            input = console.readLine();
         }
 
-        String input = args[0];
         String host = "127.0.0.1";
-        int port = 5000; // TODO: match port with SocketServer
+        int port = 6100;
 
-        Socket socket = new Socket(host, port);
+        try {
+            Socket sock = new Socket(host, port);
 
-        // Get output stream first, then input stream (avoid deadlock)
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // Lock-step: get output stream first while server gets input stream first
+            PrintWriter pout = new PrintWriter(sock.getOutputStream(), true);
+            pout.println(input);
 
-        // TODO: send input string to server
-        out.println(input);
+            // Then get ObjectInputStream and read the MessageImpl object from the socket
+            ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
+            Message msg = (Message) ois.readObject();
 
-        // TODO: read and print response from server
-        String response = in.readLine();
-        System.out.println("Server response: " + response);
+            System.out.println("Characters: " + msg.getCharacterCount());
+            System.out.println("Digits: " + msg.getDigitCount());
 
-        socket.close();
+            sock.close();
+        } catch (IOException ioe) {
+            System.err.println(ioe);
+        }
     }
 }

@@ -1,5 +1,11 @@
-public interface Message {
-    // TODO: add method signatures based on assignment description
-    int countCharacters(String s);
-    int countDigits(String s);
+public interface Message
+{
+    // set the counts for characters and digits
+    public void setCounts();
+
+    // return the number of characters
+    public int getCharacterCount();
+
+    // return the number of digits
+    public int getDigitCount();
 }
