@@ -4,29 +4,31 @@ import java.net.*;
 public class SocketServer {
 
     public static void main(String[] args) throws Exception {
-        int port = 5000; // TODO: match port with SocketClient
+        int port = 6100;
 
-        ServerSocket serverSocket = new ServerSocket(port);
-        System.out.println("Server listening on port " + port);
+        try {
+            ServerSocket sock = new ServerSocket(port);
+            while (true) {
+                Socket client = sock.accept();
 
-        Socket socket = serverSocket.accept();
-        System.out.println("Client connected.");
+                // Lock-step: get input stream first while client gets output stream first
+                BufferedReader pin = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                String received = pin.readLine();
+                System.out.println("Received: " + received);
 
-        // Get input stream first, then output stream (avoid deadlock)
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                // Construct MessageImpl, count characters and digits
+                MessageImpl msg = new MessageImpl(received);
+                msg.setCounts();
 
-        // TODO: read string from client
-        String received = in.readLine();
-        System.out.println("Received: " + received);
+                // Then get ObjectOutputStream and write the MessageImpl object to the socket
+                ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
+                oos.writeObject(msg);
+                oos.flush();
 
-        // TODO: process the string using MessageImpl and send response
-        Message msg = new MessageImpl();
-        int chars = msg.countCharacters(received);
-        int digits = msg.countDigits(received);
-        out.println("Characters: " + chars + ", Digits: " + digits);
-
-        socket.close();
-        serverSocket.close();
+                client.close();
+            }
+        } catch (IOException ioe) {
+            System.err.println(ioe);
+        }
     }
 }

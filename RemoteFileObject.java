@@ -1,7 +1,13 @@
 import java.rmi.*;
-import java.util.List;
 
-public interface RemoteFileObject extends Remote {
-    // TODO: add method signatures based on assignment description
-    List<String> readFile(String fileName) throws RemoteException;
+public interface RemoteFileObject extends Remote
+{
+    public abstract void open(String fileName)
+        throws RemoteException;
+
+    public abstract String readLine()
+        throws RemoteException;
+
+    public abstract void close()
+        throws RemoteException;
 }

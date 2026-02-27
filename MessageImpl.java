@@ -1,22 +1,32 @@
-public class MessageImpl implements Message {
+import java.io.Serializable;
 
-    @Override
-    public int countCharacters(String s) {
-        // TODO: count alphabet characters (a-z, A-Z)
-        int count = 0;
-        for (char c : s.toCharArray()) {
-            if (Character.isLetter(c)) count++;
-        }
-        return count;
+public class MessageImpl implements Message, Serializable {
+
+    private String message;
+    private int charCount;
+    private int digitCount;
+
+    public MessageImpl(String message) {
+        this.message = message;
     }
 
     @Override
-    public int countDigits(String s) {
-        // TODO: count digit characters (0-9)
-        int count = 0;
-        for (char c : s.toCharArray()) {
-            if (Character.isDigit(c)) count++;
+    public void setCounts() {
+        charCount = 0;
+        digitCount = 0;
+        for (char c : message.toCharArray()) {
+            if (Character.isLetter(c)) charCount++;
+            else if (Character.isDigit(c)) digitCount++;
         }
-        return count;
+    }
+
+    @Override
+    public int getCharacterCount() {
+        return charCount;
+    }
+
+    @Override
+    public int getDigitCount() {
+        return digitCount;
     }
 }
